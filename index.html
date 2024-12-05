@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mocambo Grita + Broto</title>
+    <style>
+        /* Configurações gerais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Fundo da página */
+        body {
+            background-image: url('imagem fundo.png'); /* Caminho da imagem enviada */
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-align: center;
+        }
+
+        /* Estilos para as páginas */
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            opacity: 1;
+            transition: opacity 1s ease;
+        }
+
+        /* Fundo transparente apenas para a página inicial */
+        .initial-page {
+            background: none;
+        }
+
+        .new-page, .third-page, .fourth-page, .fifth-page, .sixth-page, .seventh-page, .eighth-page, .ninth-page, .tenth-page, .eleventh-page, .twelfth-page {
+            display: none;
+            opacity: 0;
+            background-image: url('imagem fundo.png');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        /* Máscara preta com blur e degradê (não aplicada na página inicial) */
+        .new-page::before, .third-page::before, .fourth-page::before, .fifth-page::before,
+        .sixth-page::before, .seventh-page::before, .eighth-page::before, .ninth-page::before, .tenth-page::before,
+        .eleventh-page::before, .twelfth-page::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9));
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Ajuste específico para telas grandes */
+        @media (min-width: 1024px) {
+            .new-page::before, .third-page::before, .fourth-page::before, .fifth-page::before,
+            .sixth-page::before, .seventh-page::before, .eighth-page::before, .ninth-page::before, 
+            .tenth-page::before, .eleventh-page::before, .twelfth-page::before {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        /* Container para as logos e sinal de mais */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 2s ease-in;
+        }
+
+        /* Logos */
+        .logo {
+            width: 300px;
+            max-width: 80%;
+            margin: 0 10px;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-in forwards;
+        }
+
+        /* Animação de fade-in para as logos */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Estilo do sinal de mais */
+        .plus {
+            font-size: 100px;
+            font-weight: bold;
+            color: #C4600E;
+            animation: moveSideToSide 2s ease-in-out infinite;
+        }
+
+        /* Animação de movimento para o sinal de mais */
+        @keyframes moveSideToSide {
+            0%, 100% { transform: translateX(-3px); }
+            50% { transform: translateX(3px); }
+        }
+
+        /* Conteúdo das páginas */
+        .new-page-content, .third-page-content, .fourth-page-content, .fifth-page-content, .sixth-page-content,
+        .seventh-page-content, .eighth-page-content, .ninth-page-content, .tenth-page-content, .eleventh-page-content, .twelfth-page-content {
+            max-width: 500px;
+            font-size: 24px;
+            padding: 50px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            color: #fff;
+            z-index: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Centralização apenas das opções na página 11 */
+        .eleventh-page .options {
+            align-items: center;
+        }
+
+        /* Alinhamento de texto */
+        .new-page-content, .fifth-page-content, .eleventh-page-content, .twelfth-page-content {
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Estilo aumentado para a caixa de texto da página cinco */
+        .input-field-container .input-field {
+            width: 100%;
+            height: 60px;
+            font-size: 18px;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            resize: none;
+        }
+
+        .third-page-content, .fourth-page-content, .sixth-page-content, .seventh-page-content, .eighth-page-content,
+        .ninth-page-content, .tenth-page-content {
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        /* Títulos e subtítulos */
+        .third-page-title, .fourth-page-title, .fifth-page-title, .sixth-page-title, .seventh-page-title,
+        .eighth-page-title, .ninth-page-title, .tenth-page-title, .eleventh-page-title, .twelfth-page-title {
+            font-size: 30px;
+            font-weight: bold;
+            opacity: 0;
+            animation: fadeIn 1.0s ease-in forwards;
+        }
+
+        .third-page-subtitle, .fourth-page-subtitle, .fifth-page-subtitle, .sixth-page-subtitle, .seventh-page-subtitle,
+        .eighth-page-subtitle, .ninth-page-subtitle, .tenth-page-subtitle, .eleventh-page-subtitle, .twelfth-page-subtitle {
+            font-size: 18px;
+            opacity: 0;
+            animation: fadeIn 1.5s ease-in forwards;
+        }
+
+        /* Estilo do botão "Próximo" */
+        .next-button {
+            background-color: #CB6411;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            align-self: center;
+        }
+
+        .next-button:hover {
+            background-color: #b5560d;
+        }
+
+        /* Destaque em coloração específica */
+        .highlight-orange {
+            color: #CB6411;
+            font-weight: bold;
+        }
+
+        /* Estilo das opções de múltipla escolha */
+        .options {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .option label {
+            display: flex;
+            align-items: center;
+            font-size: 22px;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 10px;
+        
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Página inicial -->
+    <div class="page initial-page">
+        <div class="logo-container">
+            <img src="logo-mocambo.png" alt="Logo Mocambo Grita" class="logo">
+            <div class="plus">+</div>
+            <img src="logo-broto.png" alt="Logo Broto" class="logo">
+        </div>
+    </div>
+
+    <!-- Segunda página com a mensagem e botão "Próximo" -->
+    <div class="page new-page">
+        <div class="new-page-content">
+            <p>Suas experiências e impressões são importantes para continuarmos criando momentos <span class="highlight-orange">inesquecíveis</span>!</p>
+            <p>Vamos conversar?</p>
+            <button class="next-button" onclick="goToThirdPage()">Próximo</button>
+        </div>
+    </div>
+
+       <!-- Terceira página com pergunta de faixa etária -->
+    <div class="page third-page">
+        <div class="third-page-content">
+            <h1 class="third-page-title">Quantos anos você tem?</h1>
+            <p class="third-page-subtitle">Estamos curiosos para conhecer melhor nosso público! <span class="highlight-orange">Qual a sua faixa etária?</span></p>
+            <div class="options">
+                <div class="option"><label><input type="radio" name="age" value="under-18"> Menos de 18 anos</label></div>
+                <div class="option"><label><input type="radio" name="age" value="18-24"> 18-24 anos</label></div>
+                <div class="option"><label><input type="radio" name="age" value="25-34"> 25-34 anos</label></div>
+                <div class="option"><label><input type="radio" name="age" value="35-44"> 35-44 anos</label></div>
+                <div class="option"><label><input type="radio" name="age" value="45-plus"> 45 anos ou mais</label></div>
+            </div>
+            <button class="next-button" onclick="goToFourthPage()">Próximo</button>
+        </div>
+    </div>
+
+    <!-- Quarta página com pergunta sobre identidade de gênero -->
+    <div class="page fourth-page">
+        <div class="fourth-page-content">
+            <h1 class="fourth-page-title">Como você se identifica?</h1>
+            <p class="fourth-page-subtitle">Adoramos conhecer a diversidade do nosso público! <span class="highlight-orange">Qual é o seu gênero?</span></p>
+            <div class="options">
+                <div class="option"><label><input type="radio" name="gender" value="female"> Mulher</label></div>
+                <div class="option"><label><input type="radio" name="gender" value="male"> Homem</label></div>
+                <div class="option"><label><input type="radio" name="gender" value="non-binary"> Não-binário</label></div>
+            </div>
+            <button class="next-button" onclick="goToFifthPage()">Próximo</button>
+        </div>
+    </div>
+
+    <!-- Quinta página com entrada de texto -->
+    <div class="page fifth-page">
+        <div class="fifth-page-content">
+            <h1 class="fifth-page-title">De onde você veio para curtir esse evento?</h1>
+            <p class="fifth-page-subtitle">Queremos saber até onde nossa vibe chegou! <span class="highlight-orange">De qual cidade ou região você veio?</span></p>
+            <div class="input-field-container">
+                <input type="text" class="input-field" placeholder="Escreva aqui" maxlength="500" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Escreva aqui'">
+            </div>
+            <button class="next-button" onclick="goToSixthPage()">Próximo</button>
+        </div>
+    </div>
+
+    <!-- Sexta página com pergunta sobre como descobriu o evento -->
+    <div class="page sixth-page">
+        <div class="sixth-page-content">
+            <h1 class="sixth-page-title">Como você descobriu esse evento?</h1>
+            <p class="sixth-page-subtitle">Pelo Instagram, por indicação de alguém, ou descobriu de outra forma?<span class="highlight-orange"> Conta para a gente!</span></p>
+            <div class="options">
+                <div class="option"><label><input type="radio" name="discovery" value="social-mocambo"> Redes sociais da Mocambo Grita</label></div>
+                <div class="option"><label><input type="radio" name="discovery" value="social-broto"> Redes sociais da Broto</label></div>
+                <div class="option"><label><input type="radio" name="discovery" value="friend-invite"> Convite de amigo (a)</label></div>
+                <div class="option"><label><input type="radio" name="discovery" value="heard-on-street"> Estava passando na rua e ouvi o som</label></div>
+            </div>
+            <button class="next-button" onclick="goToSeventhPage()">Próximo</button>
+        </div>
+    </div>
+
+    <!-- Sétima página com pergunta sobre companhia no evento -->
+    <div class="page seventh-page">
+        <div class="seventh-page-content">
+            <h1 class="seventh-page-title">Você curtiu o evento sozinho </span> ou com uma <span class="highlight-orange"> galera?</span></h1>
+            <p class="seventh-page-subtitle">A gente adora saber se você veio solo, com amigos ou em família!</p>
+            <div class="options">
+                <div class="option"><label><input type="radio" name="company" value="alone"> Sozinho(a)</label></div>
+                <div class="option"><label><input type="radio" name="company" value="with-friends"> Com amigos(as)</label></div>
+                <div class="option"><label><input type="radio" name="company" value="with-family"> Com familiares</label></div>
+                <div class="option"><label><input type="radio" name="company" value="with-partner"> Em casal</label></div>
+            </div>
+            <button class="next-button" onclick="goToEighthPage()">Próximo</button>
+        </div>
+    </div>
+
+    <!-- Oitava página com pergunta sobre conexão nas redes sociais -->
+    <div class="page eighth-page">
+        <div class="eighth-page-content">
+            <h1 class="eighth-page-title">Durante o evento, você se conectou com a gente nas<span class="highlight-orange"> redes sociais?</span></h1>
+            <p class="eighth-page-subtitle">Você seguiu alguma de nossas páginas pra ficar por dentro das<span class="highlight-orange"> novidades?</span></p>
+            <div class="options">
+                <div class="option"><label><input type="radio" name="social-follow" value="followed-mocambo"> Seguiu a Mocambo Grita nas redes sociais</label></div>
+                <div class="option"><label><input type="radio" name="social-follow" value="followed-broto"> Seguiu a Broto nas redes sociais</label></div>
+                <div class="option"><label><input type="radio" name="social-follow" value="none"> Não seguiu nenhuma das páginas</label></div>
+            </div>
+            <button class="next-button" onclick="goToNinthPage()">Próximo</button>
+        </div>
+    </div>
+
+    <!-- Nona página com pergunta sobre o som no ambiente -->
+    <div class="page ninth-page">
+        <div class="ninth-page-content">
+            <h1 class="ninth-page-title">O som melhorou a sua experiência na<span class="highlight-orange"> Broto?</span></h1>
+            <p class="ninth-page-subtitle">Queremos saber se você curtiu o ambiente e o som com<span class="highlight-orange"> a gente!</span></p>
+            <div class="options">
+                <div class="option"><label><input type="radio" name="music-experience" value="enhanced"> Sim, a música elevou a experiência!</label></div>
+                <div class="option"><label><input type="radio" name="music-experience" value="more-variety"> Gostei bastante do som, mas acho que poderia ter mais variedade</label></div>
+                <div class="option"><label><input type="radio" name="music-experience" value="too-loud"> A música estava ótima, mas o volume estava um pouco alto para mim</label></div>
+                <div class="option"><label><input type="radio" name="music-experience" value="not-fit"> Não, acho que as duas coisas não combinam</label></div>
+            </div>
+            <button class="next-button" onclick="goToTenthPage()">Próximo</button>
+        </div>
+    </div>
+
+    <!-- Décima página com pergunta sobre estilo musical e expectativa do evento -->
+    <div class="page tenth-page">
+        <div class="tenth-page-content">
+            <h1 class="tenth-page-title">O evento atendeu suas <span class="highlight-orange"> expectativas?</span></h1>
+            <p class="tenth-page-subtitle">Queremos sempre superar o que você espera.<span class="highlight-orange"> Como você descreveria a experiência?</span></p>
+            <div class="options">
+                <div class="option"><label><input type="radio" name="expectations" value="exceeded"> Sim, superou minhas expectativas</label></div>
+                <div class="option"><label><input type="radio" name="expectations" value="met"> Sim, atendeu bem</label></div>
+                <div class="option"><label><input type="radio" name="expectations" value="average"> Regular, pode melhorar</label></div>
+                <div class="option"><label><input type="radio" name="expectations" value="not-met"> Não atendeu</label></div>
+            </div>
+            <button class="next-button" onclick="goToEleventhPage()">Próximo</button>
+        </div>
+    </div>
+
+    <!-- Página 11 -->
+    <div class="page eleventh-page">
+        <div class="eleventh-page-content">
+            <h1 class="eleventh-page-title">Você virá ao próximo <span class="highlight-orange"> evento?</span></h1>
+            <div class="options">
+                <div class="option"><label><input type="radio" name="next-event" value="yes"> Com certeza, estarei aqui 😎</label></div>
+                <div class="option"><label><input type="radio" name="next-event" value="no"> Não gosto de me divertir 😜</label></div>
+            </div>
+            <button class="next-button" onclick="goToTwelfthPage()">Próximo</button>
+        </div>
+    </div>
+
+    <div class="page twelfth-page">
+        <div class="twelfth-page-content">
+            <h1 class="twelfth-page-title">Muito obrigado pelo seu feedback!</h1>
+            <p class="twelfth-page-subtitle">Estamos ansiosos para vê-lo no próximo evento.</p>
+            <!-- Botão com link direto para a pasta do Google Drive -->
+            <a href="https://drive.google.com/drive/folders/1SRU7Ar-PdppgAltwjJ0jUROeXaAhdqQF" target="_blank">
+                <button class="next-button" onclick="sendData()">Acessar fotos</button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+             // Funções de navegação
+        function goToNewPage() {
+            document.querySelector('.initial-page').style.opacity = '0';
+            setTimeout(function () {
+                document.querySelector('.initial-page').style.display = 'none';
+                document.querySelector('.new-page').style.display = 'flex';
+                setTimeout(function () {
+                    document.querySelector('.new-page').style.opacity = '1';
+                }, 100);
+            }, 1000);
+        }
+
+        function goToThirdPage() {
+            document.querySelector('.new-page').style.opacity = '0';
+            setTimeout(function () {
+                document.querySelector('.new-page').style.display = 'none';
+                document.querySelector('.third-page').style.display = 'flex';
+                setTimeout(function () {
+                    document.querySelector('.third-page').style.opacity = '1';
+                }, 100);
+            }, 1000);
+        }
+
+        function goToFourthPage() {
+            if (document.querySelector('input[name="age"]:checked')) {
+                document.querySelector('.third-page').style.opacity = '0';
+                setTimeout(function () {
+                    document.querySelector('.third-page').style.display = 'none';
+                    document.querySelector('.fourth-page').style.display = 'flex';
+                    setTimeout(function () {
+                        document.querySelector('.fourth-page').style.opacity = '1';
+                    }, 100);
+                }, 1000);
+            } else {
+                alert("Por favor, responda a pergunta antes de avançar.");
+            }
+        }
+
+        function goToFifthPage() {
+            if (document.querySelector('input[name="gender"]:checked')) {
+                document.querySelector('.fourth-page').style.opacity = '0';
+                setTimeout(function () {
+                    document.querySelector('.fourth-page').style.display = 'none';
+                    document.querySelector('.fifth-page').style.display = 'flex';
+                    setTimeout(function () {
+                        document.querySelector('.fifth-page').style.opacity = '1';
+                    }, 100);
+                }, 1000);
+            } else {
+                alert("Por favor, responda a pergunta antes de avançar.");
+            }
+        }
+
+        function goToSixthPage() {
+            const textInput = document.querySelector('.input-field');
+            if (textInput.value.trim()) {
+                document.querySelector('.fifth-page').style.opacity = '0';
+                setTimeout(function () {
+                    document.querySelector('.fifth-page').style.display = 'none';
+                    document.querySelector('.sixth-page').style.display = 'flex';
+                    setTimeout(function () {
+                        document.querySelector('.sixth-page').style.opacity = '1';
+                    }, 100);
+                }, 1000);
+            } else {
+                alert("Por favor, preencha o campo antes de avançar.");
+            }
+        }
+
+        function goToSeventhPage() {
+            if (document.querySelector('input[name="discovery"]:checked')) {
+                document.querySelector('.sixth-page').style.opacity = '0';
+                setTimeout(function () {
+                    document.querySelector('.sixth-page').style.display = 'none';
+                    document.querySelector('.seventh-page').style.display = 'flex';
+                    setTimeout(function () {
+                        document.querySelector('.seventh-page').style.opacity = '1';
+                    }, 100);
+                }, 1000);
+            } else {
+                alert("Por favor, selecione uma opção antes de avançar.");
+            }
+        }
+
+        function goToEighthPage() {
+            if (document.querySelector('input[name="company"]:checked')) {
+                document.querySelector('.seventh-page').style.opacity = '0';
+                setTimeout(function () {
+                    document.querySelector('.seventh-page').style.display = 'none';
+                    document.querySelector('.eighth-page').style.display = 'flex';
+                    setTimeout(function () {
+                        document.querySelector('.eighth-page').style.opacity = '1';
+                    }, 100);
+                }, 1000);
+            } else {
+                alert("Por favor, selecione uma opção antes de avançar.");
+            }
+        }
+
+        function goToNinthPage() {
+            if (document.querySelector('input[name="social-follow"]:checked')) {
+                document.querySelector('.eighth-page').style.opacity = '0';
+                setTimeout(function () {
+                    document.querySelector('.eighth-page').style.display = 'none';
+                    document.querySelector('.ninth-page').style.display = 'flex';
+                    setTimeout(function () {
+                        document.querySelector('.ninth-page').style.opacity = '1';
+                    }, 100);
+                }, 1000);
+            } else {
+                alert("Por favor, selecione uma opção antes de avançar.");
+            }
+        }
+
+        function goToTenthPage() {
+            if (document.querySelector('input[name="music-experience"]:checked')) {
+                document.querySelector('.ninth-page').style.opacity = '0';
+                setTimeout(function () {
+                    document.querySelector('.ninth-page').style.display = 'none';
+                    document.querySelector('.tenth-page').style.display = 'flex';
+                    setTimeout(function () {
+                        document.querySelector('.tenth-page').style.opacity = '1';
+                    }, 100);
+                }, 1000);
+            } else {
+                alert("Por favor, selecione uma opção antes de avançar.");
+            }
+        }
+
+        function goToEleventhPage() {
+            if (document.querySelector('input[name="expectations"]:checked')) {
+                document.querySelector('.tenth-page').style.opacity = '0';
+                setTimeout(function () {
+                    document.querySelector('.tenth-page').style.display = 'none';
+                    document.querySelector('.eleventh-page').style.display = 'flex';
+                    setTimeout(function () {
+                        document.querySelector('.eleventh-page').style.opacity = '1';
+                    }, 100);
+                }, 1000);
+            } else {
+                alert("Por favor, selecione uma opção antes de avançar.");
+            }
+        }
+
+        function goToTwelfthPage() {
+            if (document.querySelector('input[name="next-event"]:checked')) {
+                document.querySelector('.eleventh-page').style.opacity = '0';
+                setTimeout(function () {
+                    document.querySelector('.eleventh-page').style.display = 'none';
+                    document.querySelector('.twelfth-page').style.display = 'flex';
+                    setTimeout(function () {
+                        document.querySelector('.twelfth-page').style.opacity = '1';
+                    }, 100);
+                }, 1000);
+            } else {
+                alert("Por favor, selecione uma opção antes de avançar.");
+            }
+        }
+
+        // Função para enviar respostas ao Google Apps Script
+        function sendData() {
+            const data = {
+                faixaEtaria: document.querySelector('input[name="age"]:checked').value,
+                genero: document.querySelector('input[name="gender"]:checked').value,
+                cidade: document.querySelector('.input-field').value,
+                comoDescobriu: document.querySelector('input[name="discovery"]:checked').value,
+                companhia: document.querySelector('input[name="company"]:checked').value,
+                conexaoRedes: document.querySelector('input[name="social-follow"]:checked').value,
+                experienciaSom: document.querySelector('input[name="music-experience"]:checked').value,
+                expectativas: document.querySelector('input[name="expectations"]:checked').value,
+                proximoEvento: document.querySelector('input[name="next-event"]:checked').value
+            };
+            fetch("https://script.google.com/macros/s/AKfycbz4DvzchuxUcTf-ckrYE2kbnCgP7LrJJLEqF3iRxjGXYH1Hh39ABJkeh8WQd30DaCOXKg/exec", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+	       
+            })
+            .then(response => response.text())
+            .then(text => console.log("Dados enviados com sucesso:", text))
+            .catch(error => console.error("Erro ao enviar dados:", error));
+        }
+        document.body.addEventListener("click", goToNewPage, { once: true });
+    </script>
+</body>
+</html>
